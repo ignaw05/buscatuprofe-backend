@@ -1,4 +1,4 @@
-Funcionamiento de GetClases()
+# Funcionamiento de GetClases()
 
 ## MODEL
 ```
@@ -13,6 +13,19 @@ type Clase struct {
 ## MAIN
 ```
 r.GET("/getclases", controllers.GetClases)
+```
+
+## ROUTES
+### Todas las rutas de clases manejadas en un solo archivo
+#### Se usa el group para manejar desde la misma ruta GET -> '/clases' POST -> '/clases/nueva'
+```
+func ClasesRoutes(r *gin.Engine) {
+	clases := r.Group("/clases")
+	{
+		clases.GET("", controllers.GetClases)        // GET /clases
+		clases.POST("/nueva", controllers.CreateClase) // POST /clases/nueva
+	}
+}
 ```
 
 ## CONTROLLER
