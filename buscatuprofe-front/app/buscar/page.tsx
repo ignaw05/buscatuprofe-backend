@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,76 +10,8 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { Search, MapPin, DollarSign, Clock, Filter, X } from "lucide-react"
 import Link from "next/link"
 import { Slider } from "@/components/ui/slider"
+import { Clase } from "@/lib/interfaces"
 
-// Mock data for available classes
-const allClasses = [
-  {
-    id: 1,
-    title: "Matemáticas Avanzadas",
-    teacher: "Prof. Juan Pérez",
-    description: "Clases de cálculo y álgebra para nivel universitario",
-    modality: "Virtual",
-    province: "Buenos Aires",
-    price: 2500,
-    duration: 60,
-    rating: 4.8,
-  },
-  {
-    id: 2,
-    title: "Inglés Conversacional",
-    teacher: "Prof. María González",
-    description: "Mejora tu fluidez en inglés con conversaciones prácticas",
-    modality: "Presencial",
-    province: "Córdoba",
-    price: 2000,
-    duration: 90,
-    rating: 4.9,
-  },
-  {
-    id: 3,
-    title: "Programación Python",
-    teacher: "Prof. Carlos Rodríguez",
-    description: "Aprende Python desde cero hasta nivel intermedio",
-    modality: "Virtual",
-    province: "Santa Fe",
-    price: 3000,
-    duration: 120,
-    rating: 4.7,
-  },
-  {
-    id: 4,
-    title: "Física Universitaria",
-    teacher: "Prof. Ana Martínez",
-    description: "Física I y II para carreras de ingeniería",
-    modality: "Virtual",
-    province: "Buenos Aires",
-    price: 2800,
-    duration: 90,
-    rating: 4.6,
-  },
-  {
-    id: 5,
-    title: "Química Orgánica",
-    teacher: "Prof. Luis Fernández",
-    description: "Química orgánica para estudiantes de medicina y biología",
-    modality: "Presencial",
-    province: "Mendoza",
-    price: 3200,
-    duration: 120,
-    rating: 4.9,
-  },
-  {
-    id: 6,
-    title: "Guitarra para Principiantes",
-    teacher: "Prof. Diego López",
-    description: "Aprende a tocar guitarra desde cero",
-    modality: "Virtual",
-    province: "Córdoba",
-    price: 1500,
-    duration: 60,
-    rating: 4.5,
-  },
-]
 
 const provincias = [
   "Todas",
@@ -94,20 +26,41 @@ const provincias = [
 ]
 
 export default function BuscarPage() {
+  const [allClasses, setClases] = useState<Clase[]>([]) 
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
   const [modality, setModality] = useState("Todas")
   const [province, setProvince] = useState("Todas")
-  const [priceRange, setPriceRange] = useState([0, 5000])
+  const [priceRange, setPriceRange] = useState([0, 50000])
   const [showFilters, setShowFilters] = useState(false)
+
+  useEffect(() => {
+  async function fetchClases() {
+    try {
+      const res = await fetch("http://localhost:8080/clases")
+      if (!res.ok) throw new Error("Error al obtener las clases")
+      const data = await res.json()
+      setClases(data)
+    } catch (err) {
+      console.error("❌ Error:", err)
+      setError("Error al cargar las clases")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  fetchClases()
+}, [])
 
   const filteredClasses = allClasses.filter((clase) => {
     const matchesSearch =
-      clase.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      clase.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      clase.teacher.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesModality = modality === "Todas" || clase.modality === modality
-    const matchesProvince = province === "Todas" || clase.province === province
-    const matchesPrice = clase.price >= priceRange[0] && clase.price <= priceRange[1]
+      clase.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      clase.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      clase.profesor.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesModality = modality === "Todas" || clase.modalidad === modality
+    const matchesProvince = province === "Todas" || clase.provincia === province
+    const matchesPrice = clase.precio >= priceRange[0] && clase.precio <= priceRange[1]
 
     return matchesSearch && matchesModality && matchesProvince && matchesPrice
   })
@@ -115,10 +68,10 @@ export default function BuscarPage() {
   const clearFilters = () => {
     setModality("Todas")
     setProvince("Todas")
-    setPriceRange([0, 5000])
+    setPriceRange([0, 50000])
   }
 
-  const hasActiveFilters = modality !== "Todas" || province !== "Todas" || priceRange[0] !== 0 || priceRange[1] !== 5000
+  const hasActiveFilters = modality !== "Todas" || province !== "Todas" || priceRange[0] !== 0 || priceRange[1] !== 50000
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -189,6 +142,7 @@ export default function BuscarPage() {
                       <SelectItem value="Todas">Todas</SelectItem>
                       <SelectItem value="Virtual">Virtual</SelectItem>
                       <SelectItem value="Presencial">Presencial</SelectItem>
+                      <SelectItem value="Presencial y Virtual">Presencial y Virtual</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -216,7 +170,7 @@ export default function BuscarPage() {
                   <div className="space-y-2">
                     <Slider
                       min={0}
-                      max={5000}
+                      max={50000}
                       step={100}
                       value={priceRange}
                       onValueChange={setPriceRange}
@@ -246,40 +200,40 @@ export default function BuscarPage() {
                 <Card key={clase.id} className="flex flex-col hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <CardTitle className="text-xl">{clase.title}</CardTitle>
+                      <CardTitle className="text-xl">{clase.nombre}</CardTitle>
                       <span
                         className={`text-xs px-2 py-1 rounded-full whitespace-nowrap ${
-                          clase.modality === "Virtual"
+                          clase.modalidad === "Virtual"
                             ? "bg-primary/10 text-primary"
                             : "bg-secondary text-secondary-foreground"
                         }`}
                       >
-                        {clase.modality}
+                        {clase.modalidad}
                       </span>
                     </div>
                     <CardDescription className="text-sm font-medium text-foreground/80">
-                      {clase.teacher}
+                      {clase.profesor}
                     </CardDescription>
-                    <CardDescription className="line-clamp-2">{clase.description}</CardDescription>
+                    <CardDescription className="line-clamp-2">{clase.descripcion}</CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1 space-y-3">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <MapPin className="h-4 w-4" />
-                      <span>{clase.province}</span>
+                      <span>{clase.provincia}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Clock className="h-4 w-4" />
-                      <span>{clase.duration} minutos</span>
+                      <span>{clase.duracion}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-lg font-semibold text-foreground">
                         <DollarSign className="h-5 w-5" />
-                        <span>${clase.price.toLocaleString()}</span>
+                        <span>${clase.precio.toLocaleString()}</span>
                       </div>
-                      <div className="flex items-center gap-1 text-sm">
+                      {/* <div className="flex items-center gap-1 text-sm">
                         <span className="text-yellow-500">★</span>
                         <span className="font-medium">{clase.rating}</span>
-                      </div>
+                      </div> */}
                     </div>
                   </CardContent>
                   <CardFooter>
