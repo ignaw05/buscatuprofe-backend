@@ -1,2 +1,0 @@
-go mod init github.com/tu_usuario/tu_proyecto
-go get -u github.com/gin-gonic/gin
