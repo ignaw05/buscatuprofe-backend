@@ -7,7 +7,7 @@ import (
 )
 
 func GetInfoProfesor(id string) (models.DTOProfesor, error) {
-	profesor, err := repository.GetProfesorById(id)
+	profesor, err := repository.GetCompleteProfesorById(id)
 
 	if err != nil {
 		return models.DTOProfesor{}, fmt.Errorf("no se pudo obtener el profesor")

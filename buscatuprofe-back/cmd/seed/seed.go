@@ -105,7 +105,7 @@ func main() {
 		{
 			Nombre:      "Matemática Básica",
 			Descripcion: "Introducción a álgebra, ecuaciones y funciones.",
-			ProvinciaID: mendoza.ID,
+			ProvinciaID: 1,
 			Precio:      15000,
 			Duracion:    models.Duracion60,
 			Modalidad:   models.Presencial,
@@ -116,7 +116,7 @@ func main() {
 		{
 			Nombre:      "Física I",
 			Descripcion: "Movimiento rectilíneo, leyes de Newton y energía.",
-			ProvinciaID: bsAs.ID,
+			ProvinciaID: 1,
 			Precio:      18000,
 			Duracion:    models.Duracion90,
 			Modalidad:   models.Mixta,
@@ -127,7 +127,7 @@ func main() {
 		{
 			Nombre:      "Programación en Go",
 			Descripcion: "Introducción al lenguaje Go, sintaxis y buenas prácticas.",
-			ProvinciaID: cordoba.ID,
+			ProvinciaID: 2,
 			Precio:      25000,
 			Duracion:    models.Duracion120,
 			Modalidad:   models.Virtual,
@@ -138,7 +138,7 @@ func main() {
 		{
 			Nombre:      "Química General",
 			Descripcion: "Estructura atómica, enlaces y reacciones químicas.",
-			ProvinciaID: mendoza.ID,
+			ProvinciaID: 1,
 			Precio:      17000,
 			Duracion:    models.Duracion75,
 			Modalidad:   models.Presencial,
@@ -149,7 +149,7 @@ func main() {
 		{
 			Nombre:      "Historia Argentina Contemporánea",
 			Descripcion: "Desde el siglo XX hasta la actualidad.",
-			ProvinciaID: bsAs.ID,
+			ProvinciaID: 3,
 			Precio:      16000,
 			Duracion:    models.Duracion90,
 			Modalidad:   models.Mixta,

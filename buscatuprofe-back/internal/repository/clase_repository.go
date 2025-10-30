@@ -16,7 +16,9 @@ func GetAllClases() ([]models.Clase, error) {
 
 func GetClasePorId(id string) (models.Clase,error) {
 	var clase models.Clase
-	result := db.DB.Find(&clase, "id = ?",id)
+	result := db.DB.
+	Preload("Materias").
+	First(&clase, "id = ?",id)
 	return clase, result.Error
 }
 
@@ -32,10 +34,16 @@ func GetAllProfesores() ([]models.Profesor, error) {
 	return profesor,result.Error
 }
 
-func GetMateriaById(id string) (models.Materia, error) {
+func GetMateriaById(id uint) (models.Materia, error) {
 	var materia models.Materia
 	result := db.DB.Find(&materia, "id = ?",id)
 	return materia,result.Error
+}
+
+func GetProvinciaById(id uint) (models.Provincia, error) {
+	var prov models.Provincia
+	result := db.DB.Find(&prov, "id = ?",id)
+	return prov,result.Error
 }
 
 func GetMateriaByNombre(nombre string) (models.Materia, error) {

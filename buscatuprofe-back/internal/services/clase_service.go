@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"buscatuprofe/internal/models"
 	"buscatuprofe/internal/repository"
+	"strconv"
 )
 
 func GetClases() ([]models.DTOClase, error) {
@@ -68,8 +69,46 @@ func GetClases() ([]models.DTOClase, error) {
 	return dtoClases,nil
 }
 
-func GetClasePorId (id string) (models.Clase,error) {
-	return repository.GetClasePorId(id)
+func GetClasePorId (id string) (models.DTOClase,error) {
+	var clase models.Clase
+	var err error
+	clase, err = repository.GetClasePorId(id)
+
+	if err != nil {
+		return models.DTOClase{}, fmt.Errorf("no se pudo obtener la clase")
+	}
+
+	provincia,err := repository.GetProvinciaById(clase.ProvinciaID)
+	if err != nil {
+		return models.DTOClase{},fmt.Errorf("no se pudo obtener la provincia")
+	}
+
+	profesor, err := repository.GetCompleteProfesorById(strconv.Itoa(int(clase.ProfesorID)))
+	if err != nil {
+		return models.DTOClase{},fmt.Errorf("no se pude obtener el profesor")
+	}
+
+	var materiasClase []string 
+	j := 0
+	for j < len(clase.Materias){
+		materiasClase = append(materiasClase, clase.Materias[j].Nombre)
+		j++
+	}
+
+	claseBuscada := models.DTOClase{
+		ID: clase.ID,
+		Nombre : clase.Nombre,
+		Descripcion: clase.Descripcion,
+		Precio: clase.Precio,
+		Profesor: profesor.Nombre,
+		Provincia: provincia.Nombre,
+		Duracion: string(clase.Duracion),
+		Modalidad: string(clase.Modalidad),
+		Nivel: string(clase.Nivel),
+		Materias: materiasClase,
+	}
+
+	return claseBuscada, err
 }
 // Modificar para retornar DTO
 

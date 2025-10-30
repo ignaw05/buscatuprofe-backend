@@ -5,7 +5,7 @@ import (
 	"buscatuprofe/internal/db"
 )
 
-func GetProfesorById(id string) (models.Profesor, error) {
+func GetCompleteProfesorById(id string) (models.Profesor, error) {
 	var profesor models.Profesor
 	result := db.DB.
 	Preload("Disponibilidad.Dia").
