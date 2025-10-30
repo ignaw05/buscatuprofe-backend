@@ -10,5 +10,6 @@ func ClasesRoutes(r *gin.Engine) {
 	{
 		clases.GET("", controllers.GetClases)        // GET /clases
 		clases.GET("/:id", controllers.GetClasePorId) 	// GET clases/id
+		clases.POST("/nueva", controllers.AddClase)
 	}
 }

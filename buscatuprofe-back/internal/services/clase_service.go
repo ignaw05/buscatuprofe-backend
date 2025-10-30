@@ -21,7 +21,6 @@ func GetClases() ([]models.DTOClase, error) {
 	for i < cantClases{
 		clase := clases[i]
 
-		// 🚀 Traer todas las provincias una sola vez
 		provincias, err := repository.GetAllProvincias()
 		if err != nil {
 			return nil, fmt.Errorf("no se pudieron obtener las provincias: %w", err)
@@ -31,7 +30,6 @@ func GetClases() ([]models.DTOClase, error) {
 			provinciaMap[p.ID] = p.Nombre
 		}
 
-		// 🚀 Traer todos los profesores una sola vez
 		profesores, err := repository.GetAllProfesores()
 		if err != nil {
 			return nil, fmt.Errorf("no se pudieron obtener los profesores: %w", err)
@@ -72,6 +70,33 @@ func GetClases() ([]models.DTOClase, error) {
 
 func GetClasePorId (id string) (models.Clase,error) {
 	return repository.GetClasePorId(id)
+}
+// Modificar para retornar DTO
+
+func AddClase(clase models.DTOClasePost) (error) {
+	var materias []models.Materia
+
+	for _, m := range clase.Materias {
+		materia,err := repository.GetMateriaByNombre(m)
+		if err != nil{
+			return fmt.Errorf("no se puedo encontrar o crear la materia")
+		}
+    	materias = append(materias, materia)
+	}
+
+	newClase := models.Clase{
+		ID: clase.ID,
+		Descripcion: clase.Descripcion,
+		Precio: clase.Precio,
+		Duracion: models.Duracion(clase.Duracion),
+		Modalidad: models.Modalidad(clase.Modalidad),
+		Nivel: models.Nivel(clase.Nivel),
+		Materias: materias,
+		ProvinciaID: clase.ProvinciaID,
+		ProfesorID: clase.ProfesorID,
+	}
+	err := repository.AddClase(newClase)
+	return err
 }
 
 

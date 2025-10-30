@@ -38,7 +38,14 @@ func GetMateriaById(id string) (models.Materia, error) {
 	return materia,result.Error
 }
 
-func CreateClase(clase models.Clase) error {
+func GetMateriaByNombre(nombre string) (models.Materia, error) {
+	var materia models.Materia
+	result := db.DB.FirstOrCreate(&materia, models.Materia{Nombre: nombre})
+	return materia,result.Error
+}
+
+
+func AddClase(clase models.Clase) error {
 	result := db.DB.Create(&clase)
 	return result.Error
 }

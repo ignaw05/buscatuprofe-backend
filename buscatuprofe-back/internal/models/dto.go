@@ -14,6 +14,20 @@ type DTOClase struct{
 	Materias []string `json:"materias"`
 }
 
+type DTOClasePost struct{
+	ID uint `json:"id"`
+	Nombre      string       `json:"nombre"`
+	ProfesorID    uint       `json:"profesor_id"`
+	Descripcion string       `json:"descripcion"`
+	ProvinciaID uint         `json:"provincia_id"`
+	Precio      float64      `json:"precio"`
+
+	Duracion   string  `json:"duracion"`
+	Modalidad  string `json:"modalidad"`
+	Nivel      string     `json:"nivel"`
+	Materias []string `json:"materias"`
+}
+
 
 type DTOProfesor struct {
 	ID             uint                   `json:"id"`

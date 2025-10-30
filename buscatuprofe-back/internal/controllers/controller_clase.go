@@ -3,8 +3,10 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"buscatuprofe/internal/models"
 	"buscatuprofe/internal/services"
+
+	"github.com/gin-gonic/gin"
 )
 
 func GetClases(c *gin.Context) {
@@ -24,4 +26,18 @@ func GetClasePorId(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK,clase)
+}
+
+func AddClase(c *gin.Context) {
+	var newClase models.DTOClasePost
+	if err := c.BindJSON(&newClase); err != nil {
+		return
+	}
+
+	if err := service.AddClase(newClase); err != nil {
+		c.JSON(http.StatusOK, gin.H{"error":"no se pudo guardar la clase"})
+		return
+	}
+
+	c.JSON(http.StatusOK,gin.H{"success":"clase guardada correctamente"})
 }
