@@ -13,7 +13,7 @@ func GetClases() ([]models.DTOClase, error) {
 	clases, err = repository.GetAllClases()
 
 	if err != nil {
-		return nil, fmt.Errorf("No se pudieron obtener las clases")
+		return nil, fmt.Errorf("no se pudieron obtener las clases")
 	}
 
 	cantClases := len(clases)
@@ -29,7 +29,7 @@ func GetClases() ([]models.DTOClase, error) {
 		provinciaMap := make(map[uint]string)
 		for _, p := range provincias {
 			provinciaMap[p.ID] = p.Nombre
-	}
+		}
 
 		// 🚀 Traer todos los profesores una sola vez
 		profesores, err := repository.GetAllProfesores()
@@ -52,6 +52,7 @@ func GetClases() ([]models.DTOClase, error) {
 		}
 
 		nuevaClase := models.DTOClase{
+			ID: clase.ID,
 			Nombre : clase.Nombre,
 			Descripcion: clase.Descripcion,
 			Precio: clase.Precio,
