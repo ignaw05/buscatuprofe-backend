@@ -11,11 +11,87 @@ import { Search, MapPin, DollarSign, Clock, Filter, X } from "lucide-react"
 import Link from "next/link"
 import { Slider } from "@/components/ui/slider"
 
-const allClasses = Promise
- fetch("http://localhost:8080/clases")
-  .then((res) => res.json())
-  .catch(() => [])
+// Mock data for available classes
+const allClasses = [
+  {
+    id: 1,
+    title: "Matemáticas Avanzadas",
+    teacher: "Prof. Juan Pérez",
+    description: "Clases de cálculo y álgebra para nivel universitario",
+    modality: "Virtual",
+    province: "Buenos Aires",
+    price: 2500,
+    duration: 60,
+    rating: 4.8,
+  },
+  {
+    id: 2,
+    title: "Inglés Conversacional",
+    teacher: "Prof. María González",
+    description: "Mejora tu fluidez en inglés con conversaciones prácticas",
+    modality: "Presencial",
+    province: "Córdoba",
+    price: 2000,
+    duration: 90,
+    rating: 4.9,
+  },
+  {
+    id: 3,
+    title: "Programación Python",
+    teacher: "Prof. Carlos Rodríguez",
+    description: "Aprende Python desde cero hasta nivel intermedio",
+    modality: "Virtual",
+    province: "Santa Fe",
+    price: 3000,
+    duration: 120,
+    rating: 4.7,
+  },
+  {
+    id: 4,
+    title: "Física Universitaria",
+    teacher: "Prof. Ana Martínez",
+    description: "Física I y II para carreras de ingeniería",
+    modality: "Virtual",
+    province: "Buenos Aires",
+    price: 2800,
+    duration: 90,
+    rating: 4.6,
+  },
+  {
+    id: 5,
+    title: "Química Orgánica",
+    teacher: "Prof. Luis Fernández",
+    description: "Química orgánica para estudiantes de medicina y biología",
+    modality: "Presencial",
+    province: "Mendoza",
+    price: 3200,
+    duration: 120,
+    rating: 4.9,
+  },
+  {
+    id: 6,
+    title: "Guitarra para Principiantes",
+    teacher: "Prof. Diego López",
+    description: "Aprende a tocar guitarra desde cero",
+    modality: "Virtual",
+    province: "Córdoba",
+    price: 1500,
+    duration: 60,
+    rating: 4.5,
+  },
+]
 
+const provincias = [
+  "Todas",
+  "Buenos Aires",
+  "Córdoba",
+  "Santa Fe",
+  "Mendoza",
+  "Tucumán",
+  "Entre Ríos",
+  "Salta",
+  "Misiones",
+]
 
 export default function BuscarPage() {
   const [searchTerm, setSearchTerm] = useState("")
