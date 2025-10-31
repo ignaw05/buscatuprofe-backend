@@ -1,5 +1,7 @@
 package models
 
+import "fmt"
+
 // ---------------- ENUMS ----------------
 
 type Duracion string
