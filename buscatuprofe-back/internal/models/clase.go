@@ -1,6 +1,5 @@
 package models
 
-import "fmt"
 
 // ---------------- ENUMS ----------------
 

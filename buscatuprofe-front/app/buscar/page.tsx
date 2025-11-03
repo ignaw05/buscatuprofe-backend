@@ -31,6 +31,7 @@ export default function BuscarPage() {
   const [error, setError] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
   const [modality, setModality] = useState("Todas")
+  const [nivel, setNivel] = useState("Todos")
   const [province, setProvince] = useState("Todas")
   const [priceRange, setPriceRange] = useState([0, 50000])
   const [showFilters, setShowFilters] = useState(false)
@@ -53,25 +54,35 @@ export default function BuscarPage() {
   fetchClases()
 }, [])
 
+  const normalizeText = (text: string) => {
+    return text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+  }
+
   const filteredClasses = allClasses.filter((clase) => {
+    const normalizedSearchTerm = normalizeText(searchTerm)
     const matchesSearch =
-      clase.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      clase.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      clase.profesor.toLowerCase().includes(searchTerm.toLowerCase())
+      normalizeText(clase.nombre).includes(normalizedSearchTerm) ||
+      normalizeText(clase.descripcion).includes(normalizedSearchTerm) ||
+      normalizeText(clase.profesor).includes(normalizedSearchTerm)
     const matchesModality = modality === "Todas" || clase.modalidad === modality
     const matchesProvince = province === "Todas" || clase.provincia === province
+    const matchesNivel = nivel === "Todos" || clase.nivel === nivel
     const matchesPrice = clase.precio >= priceRange[0] && clase.precio <= priceRange[1]
 
-    return matchesSearch && matchesModality && matchesProvince && matchesPrice
+    return matchesSearch && matchesModality && matchesProvince && matchesPrice && matchesNivel
   })
 
   const clearFilters = () => {
     setModality("Todas")
     setProvince("Todas")
+    setNivel("Todos")
     setPriceRange([0, 50000])
   }
 
-  const hasActiveFilters = modality !== "Todas" || province !== "Todas" || priceRange[0] !== 0 || priceRange[1] !== 50000
+  const hasActiveFilters = modality !== "Todas" || nivel !== "Todos" || province !== "Todas" || priceRange[0] !== 0 || priceRange[1] !== 50000
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -160,6 +171,25 @@ export default function BuscarPage() {
                           {prov}
                         </SelectItem>
                       ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="nivel">Nivel</Label>
+                  <Select value={nivel} onValueChange={setNivel}>
+                    <SelectTrigger id="nivel">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Todos">Todos</SelectItem>
+                      <SelectItem value="Primaria">Primaria</SelectItem>
+                      <SelectItem value="Secundaria">Secundaria</SelectItem>
+                      <SelectItem value="Preuniversitario">Preuniversitario</SelectItem>
+                      <SelectItem value="Universitario">Universitario</SelectItem>
+                      <SelectItem value="Idioma Inicial">Idioma Inicial</SelectItem>
+                      <SelectItem value="Idioma Avanzado">Idioma Avanzado</SelectItem>
+                      <SelectItem value="Extracurricular">Extracurricular</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
