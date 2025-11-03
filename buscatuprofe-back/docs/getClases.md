@@ -1,4 +1,4 @@
-# Funcionamiento de GetClases()
+# Funcionamiento de GetAllClases()
 
 ## MODEL
 ```
@@ -12,7 +12,7 @@ type Clase struct {
 
 ## MAIN
 ```
-r.GET("/getclases", controllers.GetClases)
+r.GET("/GetAllClases", controllers.GetAllClases)
 ```
 
 ## ROUTES
@@ -22,7 +22,7 @@ r.GET("/getclases", controllers.GetClases)
 func ClasesRoutes(r *gin.Engine) {
 	clases := r.Group("/clases")
 	{
-		clases.GET("", controllers.GetClases)        // GET /clases
+		clases.GET("", controllers.GetAllClases)        // GET /clases
 		clases.POST("/nueva", controllers.CreateClase) // POST /clases/nueva
 	}
 }
@@ -31,8 +31,8 @@ func ClasesRoutes(r *gin.Engine) {
 ## CONTROLLER
 ### Recibe la solicitud y la deriva al Service
 ```
-func GetClases(c *gin.Context) {
-	clases, err := service.GetClases()
+func GetAllClases(c *gin.Context) {
+	clases, err := service.GetAllClases()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error obteniendo clases"})
 		return
@@ -46,7 +46,7 @@ func GetClases(c *gin.Context) {
 ## SERVICE
 ### Es el encargado de la logica de negocio. Lo llama el Controller y le pide al Repository que vaya a la DB
 ```
-func GetClases() ([]models.Clase, error) {
+func GetAllClases() ([]models.Clase, error) {
 	return repository.GetAllClases()
 }
 ```

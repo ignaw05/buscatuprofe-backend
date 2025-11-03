@@ -1,0 +1,178 @@
+@startuml
+
+class ProfesorService {
+  getInfoProfesor(id string): DTOProfesor,error
+}
+
+class ProfesorController {
+  getInfoProfesor(id string): DTOProfesor,error
+}
+
+class ProfesorRepository {
+  getInfoProfesor(id string): Profesor, error
+}
+
+class ClaseService {
+  getAllClases(): []DTOAllClases, error
+  getClasePorId(id string): DTOClaseID,error
+  addClase(DTOClasePost): error
+}
+
+class ClaseController {
+  getAllClases(): []DTOAllClases, error
+  getClasePorId(id string): DTOClaseID,error
+  addClase(DTOClasePost): error
+}
+
+class ClaseRepository {
+  getAllClases(): []Clase
+  getClasePorId(id string): Clase
+  getOrCreateMateriaByNombre(nombre string): Materia,error
+  getById[T any](id): T,error
+  getAll[T any](): []T, error
+  add[T any](entity *T): error
+}
+
+
+class Clase {
+  id: uint
+  nombre: string
+  descripcion: string
+  precio: float
+}
+
+class Materia {
+  id: uint
+  nombre: string
+}
+
+enum Nivel {
+  Nivel: string
+}
+
+enum Duracion {
+  Duracion: string
+}
+
+enum Modalidad {
+  Modalidad: string
+}
+
+class Provincia {
+  id: uint
+  nombre: string
+}
+
+class Localidad {
+  id: uint
+  nombre: string
+}
+class Profesor {
+  id: uint
+  nombre: string
+  mail: string
+  telefono: string
+}
+
+class Titulo {
+  id: uint
+  nombre: string
+}
+
+class ProfesorDisponiblidad {
+  id: uint
+  hora_desde: time.Time
+  hora_hasta: time.Time
+}
+
+class Dia {
+  id: uint
+  nombre: string
+}
+
+class DTOAllClase {
+  id: uint
+  nombre: string
+  profesor: string
+  descripcion: string
+  provincia: string
+  precio: float64
+  duracion: string
+  modalidad: string
+  nivel: string
+  materias: []string 
+}
+
+class DTOClaseID {
+  id: uint
+  nombre: string
+  profesor: DTOProfesorResponse
+  descripcion: string
+  provincia: string
+  precio: float64
+  duracion: string
+  modalidad: string
+  nivel: string
+  materias: []string 
+}
+
+
+class DTOAddClase {
+  nombre: string
+  profesor_id: uint
+  descripcion: string
+  provincia_id: string
+  precio: float64
+  duracion: string
+  modalidad: string
+  nivel: string
+  materias: []string 
+}
+
+class DTOProfesor {
+  id: string
+  nombre: string
+  mail: string
+  telefono: string
+  titulos: []string
+  disponibilidad: []string
+}
+
+ClaseController --> ClaseService
+ClaseService --> ClaseRepository
+ClaseService ..> Clase
+ClaseService ..> DTOAllClase
+ClaseService ..> Provincia
+ClaseService ..> Profesor
+ClaseService ..> Materia
+ClaseService ..> DTOClaseID
+ClaseService ..> DTOAddClase
+
+ClaseRepository ..> Clase
+ClaseRepository ..> Materia
+ClaseRepository ..> Provincia
+
+ProfesorController --> ProfesorService
+ProfesorService --> ProfesorRepository
+
+ProfesorService ..> DTOProfesor
+ProfesorService ..> Profesor
+ProfesorService ..> ProfesorDisponiblidad
+ProfesorService ..> Titulo
+ProfesorService ..> Dia
+
+ProfesorRepository ..> Profesor
+ProfesorRepository ..> ProfesorDisponiblidad
+ProfesorRepository ..> Titulo
+
+Clase "1"-->"N" Materia
+Clase "N"-->"1" Profesor
+Clase "N"-->"1" Nivel
+Clase "N"-->"1" Duracion
+Clase "N"-->"1" Provincia
+Clase "N"-->"1" Modalidad
+Profesor "N"-->"N" Titulo
+Profesor "1"-->"N" ProfesorDisponiblidad
+ProfesorDisponiblidad "N"-->"1" Dia
+
+@enduml

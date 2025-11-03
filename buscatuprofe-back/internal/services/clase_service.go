@@ -1,15 +1,15 @@
 package service
 
 import (
-	"fmt"
 	"buscatuprofe/internal/models"
 	"buscatuprofe/internal/repository"
+	"fmt"
 	"strconv"
 )
 
-func GetClases() ([]models.DTOClase, error) {
+func GetAllClases() ([]models.DTOAllClase, error) {
 	var clases []models.Clase
-	var dtoClases []models.DTOClase
+	var dtoClases []models.DTOAllClase
 	var err error
 	clases, err = repository.GetAllClases()
 
@@ -19,7 +19,7 @@ func GetClases() ([]models.DTOClase, error) {
 
 	cantClases := len(clases)
 	i := 0
-	for i < cantClases{
+	for i < cantClases {
 		clase := clases[i]
 
 		provincias, err := repository.GetAll[models.Provincia]()
@@ -42,34 +42,33 @@ func GetClases() ([]models.DTOClase, error) {
 
 		fmt.Printf("Clase %s -> ProvinciaID: %d, ProfesorID: %d\n", clase.Nombre, clase.ProvinciaID, clase.ProfesorID)
 
-
-		var materiasClase []string 
+		var materiasClase []string
 		j := 0
-		for j < len(clase.Materias){
+		for j < len(clase.Materias) {
 			materiasClase = append(materiasClase, clase.Materias[j].Nombre)
 			j++
 		}
 
-		nuevaClase := models.DTOClase{
-			ID: clase.ID,
-			Nombre : clase.Nombre,
+		nuevaClase := models.DTOAllClase{
+			ID:          clase.ID,
+			Nombre:      clase.Nombre,
 			Descripcion: clase.Descripcion,
-			Precio: clase.Precio,
-			Provincia: provinciaMap[clase.ProvinciaID],
-			Profesor: profesorMap[clase.ProfesorID],
-			Duracion: string(clase.Duracion),
-			Modalidad: string(clase.Modalidad),
-			Nivel: string(clase.Nivel),
-			Materias: materiasClase,
+			Precio:      clase.Precio,
+			Provincia:   provinciaMap[clase.ProvinciaID],
+			Profesor:    profesorMap[clase.ProfesorID],
+			Duracion:    string(clase.Duracion),
+			Modalidad:   string(clase.Modalidad),
+			Nivel:       string(clase.Nivel),
+			Materias:    materiasClase,
 		}
 		dtoClases = append(dtoClases, nuevaClase)
 		i++
 	}
 
-	return dtoClases,nil
+	return dtoClases, nil
 }
 
-func GetClasePorId (id string) (models.DTOClaseID,error) {
+func GetClasePorId(id string) (models.DTOClaseID, error) {
 	var clase models.Clase
 	var err error
 	clase, err = repository.GetClasePorId(id)
@@ -78,63 +77,61 @@ func GetClasePorId (id string) (models.DTOClaseID,error) {
 		return models.DTOClaseID{}, fmt.Errorf("no se pudo obtener la clase")
 	}
 
-	provincia,err := repository.GetByID[models.Provincia](clase.ProvinciaID)
+	provincia, err := repository.GetByID[models.Provincia](clase.ProvinciaID)
 	if err != nil {
-		return models.DTOClaseID{},fmt.Errorf("no se pudo obtener la provincia")
+		return models.DTOClaseID{}, fmt.Errorf("no se pudo obtener la provincia")
 	}
 
 	profesor, err := GetInfoProfesor(strconv.Itoa(int(clase.ProfesorID)))
 	if err != nil {
-		return models.DTOClaseID{},fmt.Errorf("no se pude obtener el profesor")
+		return models.DTOClaseID{}, fmt.Errorf("no se pude obtener el profesor")
 	}
 
-	var materiasClase []string 
+	var materiasClase []string
 	j := 0
-	for j < len(clase.Materias){
+	for j < len(clase.Materias) {
 		materiasClase = append(materiasClase, clase.Materias[j].Nombre)
 		j++
 	}
 
 	claseBuscada := models.DTOClaseID{
-		ID: clase.ID,
-		Nombre : clase.Nombre,
+		ID:          clase.ID,
+		Nombre:      clase.Nombre,
 		Descripcion: clase.Descripcion,
-		Precio: clase.Precio,
-		Profesor: profesor,
-		Provincia: provincia.Nombre,
-		Duracion: string(clase.Duracion),
-		Modalidad: string(clase.Modalidad),
-		Nivel: string(clase.Nivel),
-		Materias: materiasClase,
+		Precio:      clase.Precio,
+		Profesor:    profesor,
+		Provincia:   provincia.Nombre,
+		Duracion:    string(clase.Duracion),
+		Modalidad:   string(clase.Modalidad),
+		Nivel:       string(clase.Nivel),
+		Materias:    materiasClase,
 	}
 
 	return claseBuscada, err
 }
 
-func AddClase(clase models.DTOClasePost) (error) {
+func AddClase(clase models.DTOAddClase) error {
 	var materias []models.Materia
 
 	for _, m := range clase.Materias {
-		materia,err := repository.GetOrCreateMateriaByNombre(m)
-		if err != nil{
+		materia, err := repository.GetOrCreateMateriaByNombre(m)
+		if err != nil {
 			return fmt.Errorf("no se puedo encontrar o crear la materia")
 		}
-    	materias = append(materias, materia)
+		materias = append(materias, materia)
 	}
 
 	newClase := models.Clase{
-		ID: clase.ID,
+		// ID:          clase.ID,
 		Descripcion: clase.Descripcion,
-		Precio: clase.Precio,
-		Duracion: models.Duracion(clase.Duracion),
-		Modalidad: models.Modalidad(clase.Modalidad),
-		Nivel: models.Nivel(clase.Nivel),
-		Materias: materias,
+		Precio:      clase.Precio,
+		Duracion:    models.Duracion(clase.Duracion),
+		Modalidad:   models.Modalidad(clase.Modalidad),
+		Nivel:       models.Nivel(clase.Nivel),
+		Materias:    materias,
 		ProvinciaID: clase.ProvinciaID,
-		ProfesorID: clase.ProfesorID,
+		ProfesorID:  clase.ProfesorID,
 	}
 	err := repository.Add[models.Clase](&newClase)
 	return err
 }
-
-
