@@ -45,3 +45,11 @@ func GetOrCreateMateriaByNombre(nombre string) (models.Materia, error) {
 func Add[T any](entity *T) error {
 	return db.DB.Create(entity).Error
 }
+
+func GetClasesPorProfesorID(id any) ([]models.Clase,error){
+	var clases []models.Clase
+	result := db.DB.
+		Preload("Materias").
+		Find(&clases, "profesor_id = ?",id)
+	return clases,result.Error
+}

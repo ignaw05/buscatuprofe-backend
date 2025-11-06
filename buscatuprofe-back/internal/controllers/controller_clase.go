@@ -34,10 +34,34 @@ func AddClase(c *gin.Context) {
 		return
 	}
 
+	// Validacion caracteres en nombre
+	if len([]rune(newClase.Nombre)) < 3 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "El nombre debe tener al menos 3 caracteres"})
+		return 
+	}
+
+	// Validacion campos faltantes
+	if newClase.ProvinciaID == 0 || newClase.ProfesorID == 0 || newClase.Descripcion == "" ||
+	newClase.Duracion == "" || len(newClase.Materias) == 0 || newClase.Nivel == "" || newClase.Precio == 0 || 
+	newClase.Modalidad == "" || newClase.Nombre == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Ingrese todos los campos"})
+		return
+	}
+
 	if err := service.AddClase(newClase); err != nil {
-		c.JSON(http.StatusOK, gin.H{"error": "no se pudo guardar la clase"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "no se pudo guardar la clase"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": "clase guardada correctamente"})
+}
+
+func GetClasesPorProfesorID(c *gin.Context) {
+	id := c.Param("id")
+	clases, err := service.GetClasesPorProfesorID(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error obteniendo clases"})
+		return
+	}
+	c.JSON(http.StatusOK, clases)
 }

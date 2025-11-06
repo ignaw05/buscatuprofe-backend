@@ -135,3 +135,53 @@ func AddClase(clase models.DTOAddClase) error {
 	err := repository.Add[models.Clase](&newClase)
 	return err
 }
+
+func GetClasesPorProfesorID(id any) ([]models.DTOClasesProfesor,error) {
+	var clases []models.Clase
+	var dtoClases []models.DTOClasesProfesor
+	var err error
+	clases, err = repository.GetClasesPorProfesorID(id)
+
+	if err != nil {
+		return nil, fmt.Errorf("no se pudieron obtener las clases")
+	}
+
+	cantClases := len(clases)
+	i := 0
+	for i < cantClases {
+		clase := clases[i]
+
+		provincias, err := repository.GetAll[models.Provincia]()
+		if err != nil {
+			return nil, fmt.Errorf("no se pudieron obtener las provincias: %w", err)
+		}
+		provinciaMap := make(map[uint]string)
+		for _, p := range provincias {
+			provinciaMap[p.ID] = p.Nombre
+		}
+
+		var materiasClase []string
+		j := 0
+		for j < len(clase.Materias) {
+			materiasClase = append(materiasClase, clase.Materias[j].Nombre)
+			j++
+			fmt.Println(materiasClase)
+		}
+
+		nuevaClase := models.DTOClasesProfesor{
+			ID:          clase.ID,
+			Nombre:      clase.Nombre,
+			Descripcion: clase.Descripcion,
+			Precio:      clase.Precio,
+			Provincia:   provinciaMap[clase.ProvinciaID],
+			Duracion:    string(clase.Duracion),
+			Modalidad:   string(clase.Modalidad),
+			Nivel:       string(clase.Nivel),
+			Materias:    materiasClase,
+		}
+		dtoClases = append(dtoClases, nuevaClase)
+		i++
+	}
+
+	return dtoClases, nil
+}

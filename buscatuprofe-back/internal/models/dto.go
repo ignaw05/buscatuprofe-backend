@@ -47,3 +47,16 @@ type DTOProfesor struct {
 	Titulos        []string `json:"titulos"`
 	Disponibilidad []string `json:"disponibilidad"`
 }
+
+
+type DTOClasesProfesor struct {
+	ID          uint        `json:"id"`
+	Nombre      string      `json:"nombre"`
+	Descripcion string      `json:"descripcion"`
+	Provincia   string      `json:"provincia"`
+	Precio      float64     `json:"precio"`
+	Duracion    string      `json:"duracion"`
+	Modalidad   string      `json:"modalidad"`
+	Nivel       string      `json:"nivel"`
+	Materias    []string    `json:"materias"`
+}

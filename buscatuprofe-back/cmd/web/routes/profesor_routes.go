@@ -6,8 +6,10 @@ import (
 )
 
 func ProfesorRoutes(r *gin.Engine) {
-	clases := r.Group("/profesor")
+	profesor := r.Group("/profesor")
 	{
-		clases.GET("/perfil/id=:id", controllers.GetInfoProfesor) 	// GET clases/id
+		profesor.GET("/perfil/id=:id", controllers.GetInfoProfesor)
+		profesor.GET("/clases/id=:id",controllers.GetClasesPorProfesorID)
+
 	}
 }
