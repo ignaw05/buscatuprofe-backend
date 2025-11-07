@@ -32,3 +32,15 @@ export interface ClaseID {
   nivel: string;
   materias: string[];
 }
+
+export interface ClaseProfID {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  provincia: string;
+  precio: number;
+  duracion: string;
+  modalidad: string;
+  nivel: string;
+  materias: string[];
+}

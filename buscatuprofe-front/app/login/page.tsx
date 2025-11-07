@@ -10,9 +10,12 @@ import { useRouter } from "next/navigation"
 export default function LoginPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [email, setEmail] = useState("")
+  const [error, setError] = useState("")
 
   const handleGoogleLogin = async () => {
     setIsLoading(true)
+    setError("")
     // Simulate Google OAuth flow
     // In production, this would redirect to Google OAuth
     setTimeout(() => {
@@ -20,6 +23,47 @@ export default function LoginPage() {
       // Redirect to dashboard after successful login
       router.push("/profesor")
     }, 1500)
+  }
+
+  const handleEmailLogin = async () => {
+    if (!email) {
+      setError("Por favor ingresa un email")
+      return
+    }
+
+    setIsLoading(true)
+    setError("")
+
+    try {
+      // Hacer login con el email
+      const res = await fetch("http://localhost:8080/profesor/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      })
+
+      if (!res.ok) {
+        throw new Error("Error al iniciar sesión")
+      }
+
+      const data = await res.json()
+      
+      if (data.id) {
+        // Guardar el ID del profesor en localStorage
+        localStorage.setItem("profesorId", data.id.toString())
+        // Redirigir al panel de clases
+        router.push(`/profesor/${data.id}`)
+      } else {
+        setError("No se pudo obtener el ID del profesor")
+      }
+    } catch (err) {
+      console.error("❌ Error:", err)
+      setError("Error al iniciar sesión. Por favor intenta de nuevo.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -42,6 +86,12 @@ export default function LoginPage() {
             <CardDescription>Accede a tu cuenta para continuar</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {error && (
+              <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">
+                {error}
+              </div>
+            )}
+
             {/* Google Login Button */}
             <Button
               variant="outline"
@@ -91,8 +141,24 @@ export default function LoginPage() {
 
             {/* Alternative Options */}
             <div className="space-y-3">
-              <Button variant="outline" className="w-full bg-transparent" disabled>
-                Continuar con email
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-sm font-medium">Email</label>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="tu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  disabled={isLoading}
+                />
+              </div>
+              <Button 
+                onClick={handleEmailLogin} 
+                className="w-full" 
+                disabled={isLoading}
+              >
+                {isLoading ? "Conectando..." : "Iniciar sesión con Email"}
               </Button>
               <p className="text-xs text-center text-muted-foreground">
                 Al continuar, aceptas nuestros{" "}
