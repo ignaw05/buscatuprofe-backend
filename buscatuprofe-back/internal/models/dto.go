@@ -60,3 +60,7 @@ type DTOClasesProfesor struct {
 	Nivel       string      `json:"nivel"`
 	Materias    []string    `json:"materias"`
 }
+
+type DTOMateria struct {
+	Materias []string `json:"materias"`
+}

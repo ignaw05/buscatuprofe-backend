@@ -65,3 +65,12 @@ func GetClasesPorProfesorID(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, clases)
 }
+
+func GetMaterias(c *gin.Context){
+	materias,err := service.GetMaterias()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error obteniendo clases"})
+		return
+	}
+	c.JSON(http.StatusOK, materias)
+}

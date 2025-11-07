@@ -136,7 +136,7 @@ func AddClase(clase models.DTOAddClase) error {
 	return err
 }
 
-func GetClasesPorProfesorID(id any) ([]models.DTOClasesProfesor,error) {
+func GetClasesPorProfesorID(id any) ([]models.DTOClasesProfesor, error) {
 	var clases []models.Clase
 	var dtoClases []models.DTOClasesProfesor
 	var err error
@@ -185,3 +185,32 @@ func GetClasesPorProfesorID(id any) ([]models.DTOClasesProfesor,error) {
 
 	return dtoClases, nil
 }
+
+func GetMaterias() (models.DTOMateria, error) {
+	materias, err := repository.GetAll[models.Materia]()
+	if err != nil {
+		return models.DTOMateria{}, fmt.Errorf("no se pudieron obtener las materias: %w", err)
+	}
+
+	// Eliminar duplicados usando un map
+	materiasMap := make(map[string]bool)
+	var materiaList []string
+
+	for _, materia := range materias {
+		// Si la materia no existe en el map, la agregamos
+		if !materiasMap[materia.Nombre] {
+			materiasMap[materia.Nombre] = true
+			materiaList = append(materiaList, materia.Nombre)
+		}
+	}
+
+	dtomateria := models.DTOMateria{
+		Materias: materiaList,
+	}
+	return dtomateria, nil
+}
+
+
+// FALTA PUT DE CLASES
+// FALTA QUE SE AGREGUEN LAS MATERIAS A LA DB CUANDO SE ACTUALICE
+// FALTA VERIFICACION ANTES DE CREAR LAS MATERIAS EN LA DB 

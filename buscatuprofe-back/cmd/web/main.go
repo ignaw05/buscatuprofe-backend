@@ -24,6 +24,7 @@ func main() {
 	}))
     db.Init()
     routes.ClasesRoutes(r)
+	routes.ParamRoutes(r)
 	routes.ProfesorRoutes(r)
 	r.Run("localhost:8080")
 }
