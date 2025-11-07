@@ -7,14 +7,20 @@ import { Badge } from "@/components/ui/badge"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { ArrowLeft, MapPin, Clock, DollarSign, Calendar, Users, Award, MessageCircle } from "lucide-react"
 import Link from "next/link"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import { ClaseID } from "@/lib/interfaces"
 
 
 export default function ClaseDetallesPage() {
   const [clase, setClase] = useState<ClaseID>() 
   const params = useParams()
-  // const clase = classesData[params.id as string]
+  const searchParams = useSearchParams()
+  const from = searchParams.get("from") || "/buscar"
+  const profesorId = searchParams.get("profesorId")
+  
+  // Construir el link de vuelta
+  const backLink = from === "profesor" && profesorId ? `/profesor/${profesorId}` : "/buscar"
+  const backText = from === "profesor" ? "Volver al panel" : "Volver a resultados"
 
   useEffect(() => {
   async function fetchClase() {
@@ -65,10 +71,10 @@ export default function ClaseDetallesPage() {
       {/* Main Content */}
       <main className="flex-1 container mx-auto px-4 py-8">
         {/* Back Button */}
-        <Link href="/buscar">
+        <Link href={backLink}>
           <Button variant="ghost" className="mb-6">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Volver a resultados
+            {backText}
           </Button>
         </Link>
 

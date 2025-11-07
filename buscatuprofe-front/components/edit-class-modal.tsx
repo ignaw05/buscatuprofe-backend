@@ -52,61 +52,136 @@ const provincias = [
   "Tierra del Fuego",
 ]
 
+const duraciones = [
+  "30 minutos",
+  "45 minutos",
+  "1 hora",
+  "1 hora 15 minutos",
+  "1 hora 30 minutos",
+  "1 hora 45 minutos",
+  "2 horas",
+  "2 horas 15 minutos",
+  "2 horas 30 minutos",
+  "2 horas 45 minutos",
+  "3 horas",
+]
+
+const modalidades = [
+  "Virtual",
+  "Presencial",
+  "Presencial y Virtual",
+]
+
+const niveles = [
+  "Primaria",
+  "Secundaria",
+  "Preuniversitario",
+  "Universitario",
+  "Idioma Inicial",
+  "Idioma Avanzado",
+  "Extracurricular",
+]
+
 export function EditClassModal({ open, onOpenChange, onEditClass, classData }: EditClassModalProps) {
   const [formData, setFormData] = useState({
-    title: "",
-    shortDescription: "",
-    longDescription: "",
-    modality: "",
-    province: "",
-    price: "",
-    duration: "",
+    id: 0,
+    nombre: "",
+    descripcion: "",
+    modalidad: "",
+    provincia: "",
+    precio: "",
+    duracion: "",
+    nivel: "",
+    materias: [] as string[],
   })
-  const [tags, setTags] = useState<string[]>([])
-  const [currentTag, setCurrentTag] = useState("")
+  const [materias, setMaterias] = useState<string[]>([])
+  const [currentMateria, setCurrentMateria] = useState("")
+  const [isLoadingMaterias, setIsLoadingMaterias] = useState(false)
 
   useEffect(() => {
-    if (classData) {
+    // Cargar materias disponibles
+    const fetchMaterias = async () => {
+      setIsLoadingMaterias(true)
+      try {
+        const res = await fetch("http://localhost:8080/materias")
+        if (res.ok) {
+          const data = await res.json()
+          setMaterias(data.materias || [])
+        }
+      } catch (err) {
+        console.error("Error al cargar materias:", err)
+      } finally {
+        setIsLoadingMaterias(false)
+      }
+    }
+
+    if (open) {
+      fetchMaterias()
+    }
+  }, [open])
+
+  useEffect(() => {
+    if (classData && open) {
       setFormData({
-        title: classData.title || "",
-        shortDescription: classData.shortDescription || classData.description || "",
-        longDescription: classData.longDescription || classData.fullDescription || "",
-        modality: classData.modality || "",
-        province: classData.province || "",
-        price: classData.price?.toString() || "",
-        duration: classData.duration?.toString() || "",
+        id: classData.id || 0,
+        nombre: classData.nombre || "",
+        descripcion: classData.descripcion || "",
+        modalidad: classData.modalidad || "",
+        provincia: classData.provincia || "",
+        precio: classData.precio?.toString() || "",
+        duracion: classData.duracion || "",
+        nivel: classData.nivel || "",
+        materias: classData.materias || [],
       })
-      setTags(classData.topics || [])
     }
-  }, [classData])
+  }, [classData, open])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onEditClass({
-      ...classData,
-      ...formData,
-      price: Number(formData.price),
-      duration: Number(formData.duration),
-      topics: tags,
-    })
-    onOpenChange(false)
-  }
+    
+    try {
+      const res = await fetch(`http://localhost:8080/clases/${formData.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          precio: Number(formData.precio),
+        }),
+      })
 
-  const addTag = () => {
-    if (currentTag.trim() && !tags.includes(currentTag.trim())) {
-      setTags([...tags, currentTag.trim()])
-      setCurrentTag("")
+      if (res.ok) {
+        const updatedClass = await res.json()
+        onEditClass(updatedClass)
+        onOpenChange(false)
+      }
+    } catch (err) {
+      console.error("Error al actualizar clase:", err)
     }
   }
 
-  const removeTag = (tagToRemove: string) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove))
+  const addMateria = () => {
+    if (currentMateria.trim() && !formData.materias.includes(currentMateria.trim())) {
+      setFormData({
+        ...formData,
+        materias: [...formData.materias, currentMateria.trim()],
+      })
+      setCurrentMateria("")
+    }
   }
 
-  const handleTagKeyDown = (e: React.KeyboardEvent) => {
+  const removeMateria = (materiaToRemove: string) => {
+    setFormData({
+      ...formData,
+      materias: formData.materias.filter((m) => m !== materiaToRemove),
+    })
+  }
+
+  const handleMateriaKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       e.preventDefault()
-      addTag()
+      addMateria()
     }
   }
 
@@ -120,69 +195,76 @@ export function EditClassModal({ open, onOpenChange, onEditClass, classData }: E
         <form onSubmit={handleSubmit}>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="title">Título de la clase</Label>
+              <Label htmlFor="nombre">Nombre de la clase</Label>
               <Input
-                id="title"
+                id="nombre"
                 placeholder="Ej: Matemáticas Avanzadas"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                value={formData.nombre}
+                onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="shortDescription">Descripción corta ({formData.shortDescription.length}/75)</Label>
-              <Input
-                id="shortDescription"
-                placeholder="Breve descripción de la clase"
-                value={formData.shortDescription}
-                onChange={(e) => {
-                  if (e.target.value.length <= 75) {
-                    setFormData({ ...formData, shortDescription: e.target.value })
-                  }
-                }}
-                required
-                maxLength={75}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="longDescription">Descripción detallada ({formData.longDescription.length}/150)</Label>
+              <Label htmlFor="descripcion">Descripción ({formData.descripcion.length}/500)</Label>
               <Textarea
-                id="longDescription"
+                id="descripcion"
                 placeholder="Describe en detalle lo que aprenderán los estudiantes"
-                value={formData.longDescription}
+                value={formData.descripcion}
                 onChange={(e) => {
-                  if (e.target.value.length <= 150) {
-                    setFormData({ ...formData, longDescription: e.target.value })
+                  if (e.target.value.length <= 500) {
+                    setFormData({ ...formData, descripcion: e.target.value })
                   }
                 }}
                 required
                 rows={3}
-                maxLength={150}
+                maxLength={500}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="topics">Temas que se cubren</Label>
-              <div className="flex gap-2">
+              <Label htmlFor="materias">Materias</Label>
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <Select value={currentMateria} onValueChange={setCurrentMateria}>
+                    <SelectTrigger id="materias" className="flex-1">
+                      <SelectValue placeholder="Selecciona o escribe una materia" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {isLoadingMaterias ? (
+                        <SelectItem value="loading" disabled>
+                          Cargando...
+                        </SelectItem>
+                      ) : (
+                        materias.map((materia, index) => (
+                          <SelectItem key={`${materia}-${index}`} value={materia}>
+                            {materia}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <Button type="button" variant="outline" onClick={addMateria}>
+                    Agregar
+                  </Button>
+                </div>
                 <Input
-                  id="topics"
-                  placeholder="Ej: Cálculo, Álgebra..."
-                  value={currentTag}
-                  onChange={(e) => setCurrentTag(e.target.value)}
-                  onKeyDown={handleTagKeyDown}
+                  placeholder="O escribe una nueva materia..."
+                  value={currentMateria}
+                  onChange={(e) => setCurrentMateria(e.target.value)}
+                  onKeyDown={handleMateriaKeyDown}
                 />
-                <Button type="button" variant="outline" onClick={addTag}>
-                  Agregar
-                </Button>
               </div>
-              {tags.length > 0 && (
+              {formData.materias.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="gap-1">
-                      {tag}
-                      <button type="button" onClick={() => removeTag(tag)} className="ml-1 hover:text-destructive">
+                  {formData.materias.map((materia) => (
+                    <Badge key={materia} variant="secondary" className="gap-1">
+                      {materia}
+                      <button
+                        type="button"
+                        onClick={() => removeMateria(materia)}
+                        className="ml-1 hover:text-destructive"
+                      >
                         <X className="h-3 w-3" />
                       </button>
                     </Badge>
@@ -192,17 +274,58 @@ export function EditClassModal({ open, onOpenChange, onEditClass, classData }: E
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="modality">Modalidad</Label>
+              <Label htmlFor="modalidad">Modalidad</Label>
               <Select
-                value={formData.modality}
-                onValueChange={(value) => setFormData({ ...formData, modality: value })}
+                value={formData.modalidad}
+                onValueChange={(value) => setFormData({ ...formData, modalidad: value })}
               >
-                <SelectTrigger id="modality">
+                <SelectTrigger id="modalidad">
                   <SelectValue placeholder="Selecciona la modalidad" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Virtual">Virtual</SelectItem>
-                  <SelectItem value="Presencial">Presencial</SelectItem>
+                  {modalidades.map((mod) => (
+                    <SelectItem key={mod} value={mod}>
+                      {mod}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="nivel">Nivel</Label>
+              <Select
+                value={formData.nivel}
+                onValueChange={(value) => setFormData({ ...formData, nivel: value })}
+              >
+                <SelectTrigger id="nivel">
+                  <SelectValue placeholder="Selecciona el nivel" />
+                </SelectTrigger>
+                <SelectContent>
+                  {niveles.map((nivel) => (
+                    <SelectItem key={nivel} value={nivel}>
+                      {nivel}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="duracion">Duración</Label>
+              <Select
+                value={formData.duracion}
+                onValueChange={(value) => setFormData({ ...formData, duracion: value })}
+              >
+                <SelectTrigger id="duracion">
+                  <SelectValue placeholder="Selecciona la duración" />
+                </SelectTrigger>
+                <SelectContent>
+                  {duraciones.map((dur) => (
+                    <SelectItem key={dur} value={dur}>
+                      {dur}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -210,8 +333,8 @@ export function EditClassModal({ open, onOpenChange, onEditClass, classData }: E
             <div className="space-y-2">
               <Label htmlFor="province">Provincia</Label>
               <Select
-                value={formData.province}
-                onValueChange={(value) => setFormData({ ...formData, province: value })}
+                value={formData.provincia}
+                onValueChange={(value) => setFormData({ ...formData, provincia: value })}
               >
                 <SelectTrigger id="province">
                   <SelectValue placeholder="Selecciona la provincia" />
@@ -226,33 +349,17 @@ export function EditClassModal({ open, onOpenChange, onEditClass, classData }: E
               </Select>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="price">Precio (ARS)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  placeholder="2500"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  required
-                  min="0"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="duration">Duración (min)</Label>
-                <Input
-                  id="duration"
-                  type="number"
-                  placeholder="60"
-                  value={formData.duration}
-                  onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                  required
-                  min="15"
-                  step="15"
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="price">Precio (ARS)</Label>
+              <Input
+                id="price"
+                type="number"
+                placeholder="2500"
+                value={formData.precio}
+                onChange={(e) => setFormData({ ...formData, precio: e.target.value })}
+                required
+                min="0"
+              />
             </div>
           </div>
 

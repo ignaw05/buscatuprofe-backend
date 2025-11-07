@@ -180,7 +180,7 @@ export default function ProfesorDashboard() {
                 <Button variant="outline" className="flex-1 bg-transparent" onClick={() => openEditModal(clase)}>
                   Editar
                 </Button>
-                <Link href={`/clase/${clase.id}`} className="flex-1">
+                <Link href={`/clase/${clase.id}?from=profesor&profesorId=${params.id}`} className="flex-1">
                   <Button variant="ghost" className="w-full">
                     Ver detalles
                   </Button>
