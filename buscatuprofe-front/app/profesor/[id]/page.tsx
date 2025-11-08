@@ -34,7 +34,7 @@ export default function ProfesorDashboard() {
 
     async function fetchClases() {
       try {
-        const res = await fetch(`http://localhost:8080/profesor/clases/id=${params.id}`)
+        const res = await fetch(`http://localhost:8080/profesor/clases/${params.id}`)
         if (!res.ok) throw new Error("Error al obtener las clases")
         const data = await res.json()
         setClases(data)

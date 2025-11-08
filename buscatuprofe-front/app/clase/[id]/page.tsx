@@ -25,7 +25,7 @@ export default function ClaseDetallesPage() {
   useEffect(() => {
   async function fetchClase() {
     try {
-      const res = await fetch(`http://localhost:8080/clases/id=${params.id}`)
+      const res = await fetch(`http://localhost:8080/clases/${params.id}`)
       if (!res.ok) throw new Error("Error al obtener la clase")
       const data = await res.json()
       setClase(data)
