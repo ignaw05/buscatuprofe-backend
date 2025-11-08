@@ -3,6 +3,7 @@ package service
 import (
 	"buscatuprofe/internal/models"
 	"buscatuprofe/internal/repository"
+	"buscatuprofe/internal/errors"
 	"fmt"
 	"strconv"
 )
@@ -14,7 +15,7 @@ func GetAllClases() ([]models.DTOAllClase, error) {
 	clases, err = repository.GetAllClases()
 
 	if err != nil {
-		return nil, fmt.Errorf("no se pudieron obtener las clases")
+		return nil, fmt.Errorf("no se pudieron obtener las clases: %w", errors.ErrDatabaseError)
 	}
 
 	cantClases := len(clases)
@@ -24,7 +25,7 @@ func GetAllClases() ([]models.DTOAllClase, error) {
 
 		provincias, err := repository.GetAll[models.Provincia]()
 		if err != nil {
-			return nil, fmt.Errorf("no se pudieron obtener las provincias: %w", err)
+			return nil, fmt.Errorf("no se pudieron obtener las provincias: %w", errors.ErrDatabaseError)
 		}
 		provinciaMap := make(map[uint]string)
 		for _, p := range provincias {
@@ -33,14 +34,12 @@ func GetAllClases() ([]models.DTOAllClase, error) {
 
 		profesores, err := repository.GetAll[models.Profesor]()
 		if err != nil {
-			return nil, fmt.Errorf("no se pudieron obtener los profesores: %w", err)
+			return nil, fmt.Errorf("no se pudieron obtener los profesores: %w", errors.ErrDatabaseError)
 		}
 		profesorMap := make(map[uint]string)
 		for _, pr := range profesores {
 			profesorMap[pr.ID] = pr.Nombre
 		}
-
-		fmt.Printf("Clase %s -> ProvinciaID: %d, ProfesorID: %d\n", clase.Nombre, clase.ProvinciaID, clase.ProfesorID)
 
 		var materiasClase []string
 		j := 0
@@ -74,17 +73,17 @@ func GetClasePorId(id string) (models.DTOClaseID, error) {
 	clase, err = repository.GetClasePorId(id)
 
 	if err != nil {
-		return models.DTOClaseID{}, fmt.Errorf("no se pudo obtener la clase")
+		return models.DTOClaseID{}, errors.ErrDatabaseError
 	}
 
 	provincia, err := repository.GetByID[models.Provincia](clase.ProvinciaID)
 	if err != nil {
-		return models.DTOClaseID{}, fmt.Errorf("no se pudo obtener la provincia")
+		return models.DTOClaseID{}, errors.ErrDatabaseError
 	}
 
 	profesor, err := GetInfoProfesor(strconv.Itoa(int(clase.ProfesorID)))
 	if err != nil {
-		return models.DTOClaseID{}, fmt.Errorf("no se pude obtener el profesor")
+		return models.DTOClaseID{}, errors.ErrDatabaseError
 	}
 
 	var materiasClase []string
@@ -116,7 +115,7 @@ func AddClase(clase models.DTOAddClase) error {
 	for _, m := range clase.Materias {
 		materia, err := repository.GetOrCreateMateriaByNombre(m)
 		if err != nil {
-			return fmt.Errorf("no se puedo encontrar o crear la materia")
+			return errors.ErrDatabaseError
 		}
 		materias = append(materias, materia)
 	}
@@ -143,7 +142,7 @@ func GetClasesPorProfesorID(id any) ([]models.DTOClasesProfesor, error) {
 	clases, err = repository.GetClasesPorProfesorID(id)
 
 	if err != nil {
-		return nil, fmt.Errorf("no se pudieron obtener las clases")
+		return nil, fmt.Errorf("no se pudieron obtener las clases: %w", errors.ErrDatabaseError)
 	}
 
 	cantClases := len(clases)
@@ -153,7 +152,7 @@ func GetClasesPorProfesorID(id any) ([]models.DTOClasesProfesor, error) {
 
 		provincias, err := repository.GetAll[models.Provincia]()
 		if err != nil {
-			return nil, fmt.Errorf("no se pudieron obtener las provincias: %w", err)
+			return nil, fmt.Errorf("no se pudieron obtener las provincias: %w", errors.ErrDatabaseError)
 		}
 		provinciaMap := make(map[uint]string)
 		for _, p := range provincias {
@@ -189,7 +188,7 @@ func GetClasesPorProfesorID(id any) ([]models.DTOClasesProfesor, error) {
 func GetMaterias() (models.DTOMateria, error) {
 	materias, err := repository.GetAll[models.Materia]()
 	if err != nil {
-		return models.DTOMateria{}, fmt.Errorf("no se pudieron obtener las materias: %w", err)
+		return models.DTOMateria{}, fmt.Errorf("no se pudieron obtener las materias: %w", errors.ErrDatabaseError)
 	}
 
 	// Eliminar duplicados usando un map

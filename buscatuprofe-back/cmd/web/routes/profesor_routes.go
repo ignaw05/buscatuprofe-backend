@@ -8,8 +8,8 @@ import (
 func ProfesorRoutes(r *gin.Engine) {
 	profesor := r.Group("/profesor")
 	{
-		profesor.GET("/perfil/id=:id", controllers.GetInfoProfesor)
-		profesor.GET("/clases/id=:id",controllers.GetClasesPorProfesorID)
+		profesor.GET("/perfil/:id", controllers.GetInfoProfesor)
+		profesor.GET("/clases/:id",controllers.GetClasesPorProfesorID)
 
 	}
 }

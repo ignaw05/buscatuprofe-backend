@@ -2,7 +2,6 @@ package routes
 
 import (
 	"buscatuprofe/internal/controllers"
-
 	"github.com/gin-gonic/gin"
 )
 

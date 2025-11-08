@@ -6,6 +6,9 @@ import (
 	"buscatuprofe/cmd/web/routes"
 	"buscatuprofe/internal/db"
 	"github.com/gin-contrib/cors"
+	"github.com/swaggo/files"
+    ginSwagger "github.com/swaggo/gin-swagger"
+    _ "buscatuprofe/docs" // 👈 importante: importá los docs generados
 	"time"
 )
 func init() {
@@ -26,5 +29,6 @@ func main() {
     routes.ClasesRoutes(r)
 	routes.ParamRoutes(r)
 	routes.ProfesorRoutes(r)
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.Run("localhost:8080")
 }
